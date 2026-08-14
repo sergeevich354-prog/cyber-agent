@@ -1,44 +1,50 @@
-# [Project name]
+# NEXUS AI Super-Agent Dashboard
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Мобільний Streamlit-дашборд із чотирма AI-модулями для стратегічного аналізу, роботи з файлами, SMM-контенту та генерації коду.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `streamlit run app.py --server.port 5000` — запуск дашборда
+- `python -m py_compile app.py` — швидка перевірка синтаксису
+- `OPENROUTER_API_KEY` — секрет для AI-запитів через OpenRouter
 
-## Stack
+## Стек
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Python 3.13, Streamlit
+- OpenRouter Chat Completions API
+- `requests` для HTTP-запитів
+- `pypdf` і вбудований DOCX/XML парсер для документів
 
-## Where things live
+## Де що знаходиться
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `app.py` — єдиний Streamlit-додаток і всі чотири функціональні модулі
+- `.streamlit/config.toml` — темна тема та параметри сервера
+- `requirements.txt` / `pyproject.toml` — Python-залежності
 
-## Architecture decisions
+## Архітектурні рішення
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- OpenRouter викликається напряму зі Streamlit через `OPENROUTER_API_KEY`; ключ ніколи не виводиться в UI.
+- Зображення передаються моделі як data URL, текстові формати витягуються локально перед аналізом.
+- Один журнал у session state дає спільний live-статус дій між модулями.
+- Інтерфейс свідомо зібраний на стандартних Streamlit-компонентах із мобільним CSS-шаром.
 
-## Product
+## Продукт
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Cyber-Strategist: структурований аналіз і режим Devil's Advocate.
+- Vision & Documents: аналіз зображень/PDF/DOCX/текстів і створення Markdown-документів.
+- SMM Autopilot: контент-плани для Instagram/WhatsApp і prompt builder для автовідповідей.
+- Code Kitchen: генерація Python або web-коду з вбудованим копіюванням через `st.code`.
 
-## User preferences
+## Налаштування користувача
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Темна purple cyberpunk естетика.
+- Основний UI і AI-вивід — українською мовою.
+- Пріоритет — зручність на смартфоні та великі touch-цілі.
 
-## Gotchas
+## Важливо
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Не запускати старий API-сервер як основний preview: головний процес — workflow `Start application`.
+- Для візуального аналізу потрібна модель OpenRouter із підтримкою vision; для текстових файлів доступні обидві моделі.
 
 ## Pointers
 
