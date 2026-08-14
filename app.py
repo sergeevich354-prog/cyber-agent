@@ -14,8 +14,7 @@ import streamlit as st
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL_OPTIONS = {
-    "Llama 3.1 8B": "meta-llama/llama-3.1-8b-instruct:free",
-    "Llama 3 8B (Free)": "meta-llama/llama-3-8b-instruct:free",
+    "Auto-Model (Recommended)": "openrouter/auto",
 }
 
 
