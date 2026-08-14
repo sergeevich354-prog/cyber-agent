@@ -17,15 +17,25 @@ st.title("🤖 Патрік OS v7.5 — Стратегічне Ядро")
 GEMINI_KEY = "AQ.Ab8RN6IHABjkcUUydXVQCtINDSSP439Y3pSsymlDS3YGoaZZUw"
 
 def ask_ai(system_prompt, user_query):
-    url = f"https://googleapis.com{GEMINI_KEY}"
+    # Залізобетонна пряма адреса запиту до Google API
+    url = "https://googleapis.com"
+    
     headers = {"Content-Type": "application/json"}
+    
     payload = {
-        "contents": [{"parts": [{"text": f"{system_prompt}\n\nЗапит: {user_query}"}]}]
+        "contents": [{
+            "parts": [{
+                "text": f"System Instruction: {system_prompt}\n\nUser Question: {user_query}"
+            }]
+        }]
     }
+    
     try:
-        response = requests.post(url, headers=headers, json=payload)
+        # Передаємо ключ окремим безпечним параметром
+        response = requests.post(url, headers=headers, json=payload, params={"key": GEMINI_KEY})
         if response.status_code == 200:
-            return response.json()['candidates'][0]['content']['parts'][0]['text']
+            res_json = response.json()
+            return res_json['candidates'][0]['content']['parts'][0]['text']
         else:
             return f"Помилка Google API (Код {response.status_code}): {response.text}"
     except Exception as e:
