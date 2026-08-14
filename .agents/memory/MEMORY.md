@@ -1,0 +1,1 @@
+- [Streamlit deployment entrypoint](streamlit-deployment.md) — Keep root main.py, validated deployment config, and port 8080 aligned; stop legacy services before publishing.
