@@ -28,16 +28,19 @@ mode = st.sidebar.selectbox("Обери модуль агента:", [
 
 st.title(f"🤖 Модуль: {mode}")
 
-# Функція для запиту до OpenRouter
+# ВИПРАВЛЕНА ФУНКЦІЯ: БЕЗ ПОМИЛКИ 405
 def ask_ai(system_prompt, user_query):
     if not API_KEY:
         return "Помилка: OPENROUTER_API_KEY не знайдено в налаштуваннях сервісу!"
-
+    
+    # Обов'язкові заголовки для OpenRouter, щоб не було 405/401 помилок
     headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://render.com", 
+        "X-Title": "Cyber Agent Dashboard"
     }
-
+    
     payload = {
         "model": "openrouter/auto",
         "messages": [
@@ -45,11 +48,11 @@ def ask_ai(system_prompt, user_query):
             {"role": "user", "content": user_query}
         ]
     }
-
+    
     try:
         response = requests.post("https://openrouter.ai", headers=headers, json=payload)
         if response.status_code == 200:
-            return response.json()['choices'][0]['message']['content']
+            return response.json()['choices']['message']['content']
         else:
             return f"OpenRouter повернув помилку {response.status_code}: {response.text}"
     except Exception as e:
@@ -59,12 +62,12 @@ def ask_ai(system_prompt, user_query):
 if mode == "🧠 Кібер-Strategist":
     user_query = st.text_area("Введіть твою бізнес-ідею або питання для аналізу аналітики:", placeholder="Наприклад: Який товар запустить в Україні цієї осені?")
     devils_advocate = st.checkbox("Активувати режим Devil's Advocate (Жорсткий стрес-тест ризиків)", value=True)
-
-    if st.button("⚡ Запустити стратегічне ядро"):
+    
+    if st.button("⚡ Запустити strategic core"):
         sys_prompt = "Ти — видатний бізнес-аналітик. Відповідай чітко, структуровано, українською мовою."
         if devils_advocate:
             sys_prompt += " Увімкни режим Devil's Advocate: знайди приховані загрози, касові розриви та причини чому ідея провалиться, і як їм запобігти."
-
+            
         with st.spinner("Обробка сигналу..."):
             st.info("Підготовка контексту // openrouter/auto")
             res = ask_ai(sys_prompt, user_query)
@@ -75,7 +78,7 @@ if mode == "🧠 Кібер-Strategist":
 elif mode == "👁️ Візуальний Аудит":
     st.info("Примітка: Локальний текстовий опис документів та фото.")
     doc_desc = st.text_area("Опишіть, який документ потрібно згенерувати або яку проблему на фото проаналізувати:")
-
+    
     if st.button("📝 Згенерувати документ / Аналіз"):
         with st.spinner("Синтез тексту..."):
             res = ask_ai("Ти — юридичний та технічний асистент. Створюй повноцінні документи чи звіти за описом українською мовою.", doc_desc)
@@ -85,7 +88,7 @@ elif mode == "👁️ Візуальний Аудит":
 elif mode == "📱 SMM Автопілот":
     niche = st.text_input("Ніша бізнесу (наприклад: Налаштування Google Maps, Продаж PowerStation):")
     city = st.text_input("Місто (наприклад: Охтирка, Миколаїв):")
-
+    
     if st.button("🚀 Створити SMM-Стратегію"):
         query = f"Створи контент-план та скрипти продажів для ніші {niche} у місті {city}."
         with st.spinner("Генерація контенту..."):
@@ -95,7 +98,7 @@ elif mode == "📱 SMM Автопілот":
 # 4. КУХНЯ КОДУ
 elif mode == "💻 Кухня Коду":
     code_task = st.text_area("Який сайт чи скрипт потрібно написати?", placeholder="Наприклад: Односторінковий сайт для продажу зарядних станцій на HTML/CSS з темно-фіолетовою темою.")
-
+    
     if st.button("🛠️ Згенерувати чистий код"):
         with st.spinner("Кодування..."):
             res = ask_ai("Ти — Senior Full-Stack Engineer. Пиши виключно чистий, робочий код без зайвих розмов. Якщо це HTML, роби дизайн адаптивним для телефонів.", code_task)
