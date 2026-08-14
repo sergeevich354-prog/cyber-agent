@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import os
 
 # Налаштування сторінки кібер-дашборду
 st.set_page_config(page_title="AI Super-Agent Dashboard", page_icon="🧠", layout="wide")
@@ -15,10 +14,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Зчитуємо ключ із Render
-API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-
-st.sidebar.title("🤖 Патрік OS v3.0")
+st.sidebar.title("🤖 Патрік OS v5.0")
 mode = st.sidebar.selectbox("Обери модуль агента:", [
     "🧠 Кібер-Strategist", 
     "👁️ Візуальний Аудит", 
@@ -28,65 +24,39 @@ mode = st.sidebar.selectbox("Обери модуль агента:", [
 
 st.title(f"🤖 Модуль: {mode}")
 
-# Універсальна розумна функція під будь-який тип ключа
+# Твій залізобетонний офіційний ключ Google Gemini
+GEMINI_KEY = "AQ.Ab8RN6IHABjkcUUydXVQCtINDSSP439Y3pSsymlDS3YGoaZZUw"
+
+# Пряма функція запиту до Google Gemini
 def ask_ai(system_prompt, user_query):
-    if not API_KEY:
-        return "Помилка: Ключ не знайдено в налаштуваннях сервісу Render!"
+    url = "https://googleapis.com"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "contents": [{
+            "parts": [{"text": f"System Instruction: {system_prompt}\n\nUser Question: {user_query}"}]
+        }]
+    }
     
-    # Якщо ключ від Google (починається на AIza або AQ)
-    if API_KEY.startswith("AIza") or API_KEY.startswith("AQ"):
-        url = f"https://googleapis.com{API_KEY}"
-        headers = {"Content-Type": "application/json"}
-        payload = {
-            "contents": [{
-                "parts": [{"text": f"Ти видатний ШІ-асистент. Інструкція: {system_prompt}\n\nЗапит: {user_query}"}]
-            }]
-        }
-        try:
-            response = requests.post(url, headers=headers, json=payload)
-            if response.status_code == 200:
-                return response.json()['candidates'][0]['content']['parts'][0]['text']
-            else:
-                return f"Помилка Google API ({response.status_code}): {response.text}"
-        except Exception as e:
-            return f"Збій з'єднання з Google: {str(e)}"
-            
-    # Якщо ключ від OpenRouter (починається на sk-or)
-    else:
-        url = "https://openrouter.ai"
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://render.com",
-            "X-Title": "Cyber Agent"
-        }
-        payload = {
-            "model": "openrouter/auto",
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_query}
-            ]
-        }
-        try:
-            response = requests.post(url, headers=headers, json=payload)
-            if response.status_code == 200:
-                return response.json()['choices']['message']['content']
-            else:
-                return f"Помилка OpenRouter ({response.status_code}): {response.text}"
-        except Exception as e:
-            return f"Збій з'єднання з OpenRouter: {str(e)}"
+    try:
+        response = requests.post(url, headers=headers, json=payload, params={"key": GEMINI_KEY})
+        if response.status_code == 200:
+            return response.json()['candidates']['content']['parts'][0]['text']
+        else:
+            return f"Помилка Google API (Код {response.status_code}): {response.text}"
+    except Exception as e:
+        return f"Збій з'єднання з Google: {str(e)}"
 
 # 1. КІБЕР-СТРАТЕГ
 if mode == "🧠 Кібер-Strategist":
-    user_query = st.text_area("Введіть твою бізнес-ідею або питання для аналізу аналітики:", placeholder="Наприклад: розчіска в Охтирці", value="розчіска в Охтирці")
+    user_query = st.text_area("Введіть бізнес-ідею чи питання:", value="розчіска в Охтирці")
     devils_advocate = st.checkbox("Активувати режим Devil's Advocate (Жорсткий стрес-тест ризиків)", value=True)
     
     if st.button("⚡ Запустити стратегічне ядро"):
         sys_prompt = "Ти — видатний бізнес-аналітик. Відповідай чітко, структуровано, українською мовою."
         if devils_advocate:
-            sys_prompt += " Увімкни режим Devil's Advocate: знайди приховані загрози, касові розриви та причини чому ідея провалиться, і як їм запобігти."
+            sys_prompt += " Увімкни режим Devil's Advocate: знайди 5 прихованих загроз чому ідея провалиться, і як їм запобігти."
             
-        with st.spinner("Обробка сигналу..."):
+        with st.spinner("Обробка сигналу Google..."):
             res = ask_ai(sys_prompt, user_query)
             st.subheader("РЕЗУЛЬТАТ АНАЛІЗУ")
             st.markdown(res)
@@ -111,7 +81,7 @@ elif mode == "📱 SMM Автопілот":
 
 # 4. КУХНЯ КОДУ
 elif mode == "💻 Кухня Коду":
-    code_task = st.text_area("Який сайт чи скрипт потрібно написати?", placeholder="Наприклад: Односторінковий сайт для продажу на HTML/CSS.")
+    code_task = st.text_area("Який сайт чи скрипт потрібно написати?")
     if st.button("🛠️ Згенерувати чистий код"):
         with st.spinner("Кодування..."):
             res = ask_ai("Ти — Senior Full-Stack Engineer. Пиши виключно чистий, робочий код без зайвих розмов. Якщо це HTML, роби дизайн адаптивним для телефонів.", code_task)
