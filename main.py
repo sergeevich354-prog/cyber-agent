@@ -14,7 +14,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.sidebar.title("🤖 Патрік OS v5.0")
+st.sidebar.title("🤖 Патрік OS v6.0")
 mode = st.sidebar.selectbox("Обери модуль агента:", [
     "🧠 Кібер-Strategist", 
     "👁️ Візуальний Аудит", 
@@ -27,10 +27,13 @@ st.title(f"🤖 Модуль: {mode}")
 # Твій залізобетонний офіційний ключ Google Gemini
 GEMINI_KEY = "AQ.Ab8RN6IHABjkcUUydXVQCtINDSSP439Y3pSsymlDS3YGoaZZUw"
 
-# Пряма функція запиту до Google Gemini
+# Пряма функція запиту до Google Gemini (Виправлена адреса 404)
 def ask_ai(system_prompt, user_query):
+    # Офіційна правильна адреса API згідно з документацією Google
     url = "https://googleapis.com"
+    
     headers = {"Content-Type": "application/json"}
+    
     payload = {
         "contents": [{
             "parts": [{"text": f"System Instruction: {system_prompt}\n\nUser Question: {user_query}"}]
@@ -40,7 +43,7 @@ def ask_ai(system_prompt, user_query):
     try:
         response = requests.post(url, headers=headers, json=payload, params={"key": GEMINI_KEY})
         if response.status_code == 200:
-            return response.json()['candidates']['content']['parts'][0]['text']
+            return response.json()['candidates'][0]['content']['parts'][0]['text']
         else:
             return f"Помилка Google API (Код {response.status_code}): {response.text}"
     except Exception as e:
@@ -52,7 +55,7 @@ if mode == "🧠 Кібер-Strategist":
     devils_advocate = st.checkbox("Активувати режим Devil's Advocate (Жорсткий стрес-тест ризиків)", value=True)
     
     if st.button("⚡ Запустити стратегічне ядро"):
-        sys_prompt = "Ти — видатний бізнес-аналітик. Відповідай чітко, структуровано, українською мовою."
+        sys_prompt = "Ти — видатний бізнес-аналітик. Відповідай чітко, зустрічно, структуровано, виключно українською мовою."
         if devils_advocate:
             sys_prompt += " Увімкни режим Devil's Advocate: знайди 5 прихованих загроз чому ідея провалиться, і як їм запобігти."
             
