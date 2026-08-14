@@ -14,8 +14,8 @@ import streamlit as st
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL_OPTIONS = {
-    "Gemini Flash 1.5 8B": "google/gemini-flash-1.5-8b:free",
     "Llama 3.1 8B": "meta-llama/llama-3.1-8b-instruct:free",
+    "Llama 3 8B (Free)": "meta-llama/llama-3-8b-instruct:free",
 }
 
 
