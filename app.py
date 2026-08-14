@@ -15,7 +15,7 @@ import streamlit as st
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL_OPTIONS = {
     "Gemini Flash 1.5 8B": "google/gemini-flash-1.5-8b:free",
-    "Llama 3.2 11B Vision": "meta-llama/llama-3.2-11b-vision-instruct:free",
+    "Llama 3.1 8B": "meta-llama/llama-3.1-8b-instruct:free",
 }
 
 
@@ -179,12 +179,14 @@ def render_thinking_log() -> None:
 
 
 def model_choice() -> str:
-    return st.selectbox(
+    selected_name = st.selectbox(
         "Модель OpenRouter",
         list(MODEL_OPTIONS.keys()),
         format_func=lambda value: value,
         key="model_selector",
     )
+    # Keep friendly names in the UI, but return the exact OpenRouter model ID.
+    return MODEL_OPTIONS[selected_name]
 
 
 def call_openrouter(
@@ -359,7 +361,7 @@ def strategist_page() -> None:
                         "назви 5 ризиків, контраргументи й конкретні запобіжники."
                     )
                 try:
-                    result = call_openrouter(instruction, MODEL_OPTIONS[model])
+                    result = call_openrouter(instruction, model)
                     st.session_state.last_output = result
                     add_log("Відповідь синтезовано", "done")
                 except Exception as exc:
@@ -408,7 +410,7 @@ def vision_page() -> None:
                     result = call_openrouter(
                         context
                         + "\n\nВідповідь у Markdown: ## Виявлено, ## Детальний розбір, ## Наступні кроки.",
-                        MODEL_OPTIONS[model],
+                        model,
                         image_payload=image,
                     )
                     st.session_state.last_output = result
@@ -433,7 +435,7 @@ def vision_page() -> None:
                         f"Створи {doc_type.lower()} на основі опису:\n{description}\n\n"
                         "Дай готовий до копіювання документ у чистому українському Markdown. "
                         "Додай заголовки, списки й чіткі формулювання.",
-                        MODEL_OPTIONS[model],
+                        model,
                     )
                     st.session_state.last_output = result
                     add_log("Документ готовий до експорту", "done")
@@ -474,7 +476,7 @@ def smm_page() -> None:
                             "Для кожного дня дай: назву, формат, сильний hook на перші 2 секунди, "
                             "текст поста або сценарій, CTA і 5-8 релевантних хештегів. "
                             "Окремо врахуй різницю Instagram і WhatsApp. Відповідай Markdown-таблицею.",
-                            MODEL_OPTIONS[model],
+                            model,
                         )
                         st.session_state.last_output = result
                         add_log("Контентний маршрут побудовано", "done")
@@ -497,7 +499,7 @@ def smm_page() -> None:
                             f"Повідомлення клієнта: {incoming}\n\n"
                             "Prompt має містити роль, правила тону, заборони, формат JSON-відповіді "
                             "з полями reply, intent, escalation та готовий приклад відповіді українською.",
-                            MODEL_OPTIONS[model],
+                            model,
                         )
                         st.session_state.last_output = result
                         add_log("Prompt Builder завершив роботу", "done")
@@ -536,7 +538,7 @@ def code_page() -> None:
                         "Поверни спочатку один fenced code block без вкладених fenced-блоків, "
                         "потім короткий Markdown-блок ## Як запустити українською. "
                         "Код має бути повним, чистим, з обробкою помилок і без Telegram Bot API.",
-                        MODEL_OPTIONS[model],
+                        model,
                         temperature=0.35,
                     )
                     st.session_state.last_output = result
