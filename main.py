@@ -7,7 +7,7 @@ st.title("🤖 Патрік OS v8.0 — Стратегічне Ядро")
 KEY = "AQ.Ab8RN6IHABjkcUUydXVQCtINDSSP439Y3pSsymlDS3YGoaZZUw"
 
 def ask_ai(sys_prompt, user_query):
-    url = f"https://googleapis.com{KEY}"
+url = f"https://googleapis.com{KEY}"
     payload = {"contents": [{"parts": [{"text": f"{sys_prompt}\n\nЗапит: {user_query}"}]}]}
     try:
         res = requests.post(url, headers={"Content-Type": "application/json"}, json=payload)
