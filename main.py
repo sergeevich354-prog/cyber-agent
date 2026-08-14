@@ -1,51 +1,27 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="AI Super-Agent", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="AI Super-Agent", layout="wide")
+st.title("🤖 Патрік OS v8.0 — Стратегічне Ядро")
 
-st.markdown("""
-    <style>
-    .main { background-color: #0b0914; color: #e0def4; }
-    .stButton>button { background-color: #4c1d95; color: white; border-radius: 8px; width: 100%; border: none; height: 50px; font-size: 16px; }
-    .stButton>button:hover { background-color: #6d28d9; }
-    </style>
-    """, unsafe_allow_html=True)
+KEY = "AQ.Ab8RN6IHABjkcUUydXVQCtINDSSP439Y3pSsymlDS3YGoaZZUw"
 
-st.title("🤖 Патрік OS v7.5 — Стратегічне Ядро")
-
-# Твій перевірений робочий ключ Google Gemini
-GEMINI_KEY = "AQ.Ab8RN6IHABjkcUUydXVQCtINDSSP439Y3pSsymlDS3YGoaZZUw"
-
-def ask_ai(system_prompt, user_query):
-    # Залізобетонна пряма адреса запиту до Google API
-    url = "https://googleapis.com"
-    
-    headers = {"Content-Type": "application/json"}
-    
-    payload = {
-        "contents": [{
-            "parts": [{
-                "text": f"System Instruction: {system_prompt}\n\nUser Question: {user_query}"
-            }]
-        }]
-    }
-    
+def ask_ai(sys_prompt, user_query):
+    url = f"https://googleapis.com{KEY}"
+    payload = {"contents": [{"parts": [{"text": f"{sys_prompt}\n\nЗапит: {user_query}"}]}]}
     try:
-        # Передаємо ключ окремим безпечним параметром
-        response = requests.post(url, headers=headers, json=payload, params={"key": GEMINI_KEY})
-        if response.status_code == 200:
-            res_json = response.json()
-            return res_json['candidates'][0]['content']['parts'][0]['text']
-        else:
-            return f"Помилка Google API (Код {response.status_code}): {response.text}"
+        res = requests.post(url, headers={"Content-Type": "application/json"}, json=payload)
+        if res.status_code == 200:
+            return res.json()['candidates'][0]['content']['parts'][0]['text']
+        return f"Помилка Google API: {res.text}"
     except Exception as e:
-        return f"Збій з'єднання з Google: {str(e)}"
+        return f"Збій з'єднання: {str(e)}"
 
-user_query = st.text_area("Введіть бізнес-ідею:", value="розчіска в Охтирці")
+query = st.text_area("Введіть бізнес-ідею:", value="розчіска в Охтирці")
 
 if st.button("⚡ Запустити стратегічне ядро"):
-    sys_prompt = "Ти — видатний бізнес-аналітик. Знайди 5 прихованих загроз чому ідея провалиться в цьому місті, і як їм запобігти. Відповідай українською."
+    prompt = "Ти — видатний бізнес-аналітик. Знайди 5 прихованих загроз чому ідея провалиться в цьому місті, і як їм запобігти. Відповідай українською."
     with st.spinner("Зв'язок із серверами Google..."):
-        res = ask_ai(sys_prompt, user_query)
+        result = ask_ai(prompt, query)
         st.subheader("РЕЗУЛЬТАТ АНАЛІЗУ")
-        st.markdown(res)
+        st.markdown(result)
